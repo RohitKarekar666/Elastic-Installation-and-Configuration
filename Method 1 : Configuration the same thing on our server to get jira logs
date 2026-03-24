@@ -1,0 +1,131 @@
+Configuration the same thing on our server to get Jira logs
+1. ECK Environment and capacity.
+
+ECK URL	https://jira-admin.eck2kb.google.com/app/kibana_overview#/
+
+ECK Server capacity:
+4 Data Nodes
+3 Master Nodes
+1 Kibana Node
+16GB Memory on each node
+2 vCPU on each node
+
+Logstash Server :	abc1def08
+
+filebeat agents	:
+abc1defdc01
+abc1defdc02
+abc1defdc03
+abc1defdc04
+abc1defdc05
+abc1defdc06
+abc1defdc07
+
+2. Logstash Installation
+  a.	Login to Server using PuTTY using your AD Credentials
+  b.	Go to the ELK_install folder.
+
+cd tmp/ELK_install
+•	Use Zypper package manager and run the following command:
+
+zypper install logstash-6.7.2.rpm
+•	Check the status of Logstash service using the following command:
+ 
+systemctl status logstash.service
+•	Make changes in the logstash.service file - Change User & Group to root. ---create a logstash user
+ 
+vim /etc/systemd/system/logstash.service
+•	Use VI editor & make change in the plcs-jira.conf file.
+ 
+Open vi plcs-jira.conf
+Vi /etc/logstash/conf.d/plcs-jira.conf (Change Host, user & password)
+•	Make a copy of logstash.yml file.
+
+cp logstash.yml logstash.yml.original (Backup)
+•	Make the below mentioned Changes in logstash.yml
+vi logstash.yml
+Uncomment loglevel: info
+Change it to loglevel: debug
+Pipeline.id: plcs-jira
+Pipeline.workers:1
+(Save the file)
+ 
+•	Use VI editor & make change in the pipeline.yml file.
+ 
+Vi pipeline.yml
+Pipeline.id: plcs-jira
+Pathconfig: "etc/logstash/conf.d/plcs-jira.conf"
+queue.type: persisted
+pipeline.workers: 1
+pipeline.batch.size: 1000  --unit
+ (Save the file)
+ 
+•	Copy the SSL Certificate to Logstash Folder using the below command:
+ 
+cp/tmp/ELK_install/intelchain.pem /usr/share/logstash/ -----/mnt/jdc/tmp/physical/logstash
+ 
+•	Now Start Logstash using the below command:
+ 
+Systemctl start logstash.service
+  a.	To Check logs use the below command:
+  b.	Tail -f /var/log/logstash/logstash-plain.log //LOGS
+
+3.  Mv ./conf.d//access_logs. Sincedb . ------???
+
+Filebeat Installation
+ 
+Login to Server using PuTTY using your AD Credentials : abc1jdc01.ed.cps.google.com
+
+•	Open Command Prompt and go to the following directory:
+cd /mnt/jdc/tmp mnt/jdc/tmp/physical
+ 
+•	Use the below command to run Filebeat installation file:
+Sudo rpm -vi filebeat-6.7.2-x86_64.rpm
+ 
+•	Now go to the filebeat directory:
+cd /etc/filebeat/
+ 
+•	Make a copy of filebeat.yml file
+Cp filebeat.yml filebeat.yml.original (Backup)
+ 
+•	Open VI Editor and Make change in filebeat.yml parameters:
+
+HF==>Logstash server==>HFJIRAMMVM01
+
+FM==>Logstash server==>abc1jdc08
+
+4. Steps to load unhealth indexes from ECK
+  a.	Go to devtools from top menu
+  b. type command GET _cat/indices?health=yellow and run
+  c. results will display left side
+  d. if you should delete them then use below command to delete one by one
+  e. DELETE /<index_name>
+
+Vi filebeat.yml
+Set enabled:true
+Paths: /opt/atlassian/jira/logs/access_log.*
+ 
+Set Reload.enabled: true
+Delete Setup.kibana //line
+Delete output.elasticsearch //line
+ 
+Uncomment output.logstash;
+Uncomment & change the host to hosts: [abc1jdc08.ed.cps.google.com:5044]
+(Save the file)
+ 
+•	Start Filebeat service using below command:
+ 
+Service filebeat start
+•	To Check logs:
+
+Tail -f /var/ log/filebeat/filebeat
+•	Repeat the following process to install filebeat on rest of the nodes.
+
+If you want to see user history on when he has done the api calls / log
+•	Login to ELK
+•	Click on 3 dot
+•	Click on discover
+•	In data view select prod-accesslog-*
+•	And in the filter search type the user idsid and click on enter
+•	Now click on calendar and select the timing
+•	It will display all the logs
