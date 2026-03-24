@@ -1,0 +1,35 @@
+ELK (Elastic Stack)
+Why Continuous Monitoring?
+Continuous Monitoring is an important part of software development. It is something we take up as measure to maintain the health of a software and to improve the quality of the software, and this is based on the feed back we get from the insights grained from monitoring.
+
+Types of Monitoring
+•	System Performance – System performance refers to the speed, efficiency, and resource utilization of a computer system, measured by metrics like responsiveness, throughput, and latency. It is determined by hardware (CPU, RAM, storage) and software optimization. Key ways to improve it include monitoring resources, removing startup apps, clearing disk space, and updating drivers
+•	Process monitoring – Specific process how it is getting handled, process are running or not, how is the health status of processes
+•	Integration – Integration monitoring is the proactive process of tracking, analysing, and managing the health, performance, and data integrity of connections between software applications.
+•	Application Performance – the practice of tracking software application metrics—such as response times, error rates, and resource utilization—to ensure optimal performance and user experience. It enables teams to proactively detect, diagnose, and resolve technical issues using transaction tracing, log analysis, and real-time alerts to reduce downtime
+•	Business Monitoring – It is used to monitor business improvement like customer data, which customer is interested in which product based on that it will provide the adds to the customer. It is basically monitoring the customer activity. Also, it will track the record of your selling and buying history so this will help you how much profit and loss you have met.
+Few example for Monitoring Tools
+•	ELK
+•	Nagios
+•	Prometheus
+•	Grafana
+•	Amazon Cloud watch
+•	Splunk
+
+What is ELK Stack?
+ELK stack is a set of open-source tools that allow us to monitor, collect, process analyse & visualize data, this data can be of different types and formats and from almost any source. It was developed by Elastic co. iteratively. They started with Elastic search and kept on adding more tools to the stack. The primary purpose of ELK stack is log management.
+
+ELK Features
+•	System & Application Performance
+•	Logging
+•	Stack Security & Alerting
+•	Scalability & Resiliency
+•	Dashboards & Visualisations
+
+ELK Stack Tools
+Logstash is an open-source, server-side data processing pipeline that ingests data from diverse sources simultaneously, transforms it on the fly, and sends it to a "stash" like Elasticsearch
+Filebeat is a lightweight, open-source log shipper and centralizer for the Elastic Stack, designed to monitor, collect, and forward log files to Elasticsearch or Logstash. It runs as a persistent agent, efficiently handling large data volumes, and can be deployed in containers (Docker, Kubernetes) or on servers
+Elasticsearch is a distributed, open-source search and analytics engine based on Apache Lucene, designed for speed and scalability. It stores data as schema-free JSON documents, enabling fast full-text search, structured queries, and analytics, often used for log monitoring, security analytics, and AI
+Kibana is a powerful, open-source data visualization and exploration tool designed for Elasticsearch. It serves as the visualization layer of the Elastic Stack (ELK Stack), allowing users to analyse, visualize, and build interactive dashboards on top of data stored in Elasticsearch indices, including logs, metrics, and security data.
+X-Pack is an Elastic Stack extension that bundles security, alerting, monitoring, reporting, and graph capabilities.
+Server-->Data collection-->FileBeat-->Buffe -->Logstash(Filtering & Processing)-->Elasticsearch(Indexing & Storing)-->Kibana(Analysis & Visualisation)
