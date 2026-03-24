@@ -1,0 +1,109 @@
+To Install ELK follow the below steps
+•	Download all the below files
+o	https://www.elastic.co/downloads/elasticsearch
+o	https://www.elastic.co/downloads/beats/filebeat
+o	https://www.elastic.co/downloads/logstash
+o	https://www.elastic.co/downloads/kibana
+•	If you’re in windows, then install it one by one.
+•	In you’re into other platform like Linux then follow the below steps
+o	Download all the file like above but choose Linux while downloading
+o	Now open the terminal and run these command one by one
+o	Sudo apt -get update
+o	Sudo apt -get install -y openjdk-8-jdk
+o	Sudo apt -get update
+o	Sudo apt -get -y install nginx
+o	Wget -q0 – http://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt -key add –
+o	Echo “deb https://artifacts.elastic.co/packages/7.x/apt stable main” | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+o	Sudo apt update
+o	Sudo apt install elasticsearch
+o	Sudo apt install kibana
+o	Sudo apt install logstash
+o	sudo apt install filebeat
+•	Now to activate the elasticsearch use the below command
+o	Sudo nano /etc/elasticsearch/elasticsearch.yml
+o	Now uncomment the below text from the file
+o	Cluster.name: my-application
+o	Node.name: node-1
+o	Path.data: /var/lib/elasticsearch
+o	Path.logs: /var/log/elasticsearch
+o	Network.host: localhost #remove the ip address and type localhost
+o	http.port: 9200
+o	now press ctrl + o enter
+o	now press ctrl + X
+o	sudo systemctl start elasticsearch  #to start the service
+o	sudo systemctl status elasticsearch #to check the service is enable or not
+o	curl localhost:9200
+
+•	Now to activate kibana use the below command
+o	Sudo nano /etc/kibana/kibana.yml
+o	Now uncomment the below text from the file
+o	Server.pot: 5601
+o	Server.host: “localhost”
+o	Now press ctrl+ O enter
+o	Now press ctrl + X
+o	Systemctl status kibana
+o	Sudo systemctl start kibana
+o	sudo systemctl status kibana
+•	Sudo apt install apache2-utils and click on Yes
+•	Sudo htpasswd -c /etc/nginx/htpasswd.users kibana
+•	Now enter the new password
+Now we are moving the nginx configuration files to another folder
+•	Sudo mv /etc/nginx/sites-available/default 	/etc/nginx/sites-available/new-default
+Now we are adding the new configuration file into default nginx location
+•	Sudo nano /etc/nginx/sites-available/default
+•	Type the below script
+Server {
+	Listen 80;
+	Server_name	 3.131.91.105;	#type your ip address
+	Auth_basic “Restricted Access”;
+	Auth_basic_user_file /etc/nginx/htpasswd.users;
+	Location / {
+		Proxy_pass http://localhost:5601;
+		Proxy_http_version 1.1;
+		Proxy_set_header upgrade $http_upgrade;
+		Proxy_set_header Connection ‘upgrade’;
+		proxy_set_header Host $host;
+		proxy_cache_bypass $http_upgrade;
+		}
+	}
+•	Sudo systemctl restart nginx
+•	Now go to browser and enter your password
+•	It will load the elastic
+•	Now go to home
+•	Now click on try on sample data
+Now we are testing the sample data in the elastic
+•	Click add on sample web logs
+•	Click to 3dot and select dashboard
+•	Now that sample web logs traffic will show click on that
+•	Now you can see different types of visualization and graphs
+
+Now if you want to collect the real time data and want to visualize
+•	Now from the filebeat we are going to collect the data
+•	Sudo filebeat modules list 	#it will display all the filebeat commands
+•	Sudo filebeat modules enable system
+•	Sudo filebeat modules list # now you can see the system with enable option in the list
+•	Sudo filebeat modules enable apache
+•	Sudo filebeat modules list # now you can see the system with enable option in the list
+•	Sudo nano /etc/filebeat/module.d/system.yml
+•	Now in the module:system type
+#Syslog
+	Syslog:
+	Enabled: true
+	var.paths: [“/var/log/syslog*”]
+
+	#Authorization logs
+	Auth:
+	enabled: true
+	var.paths: [“/var/log/auth.log*”]
+Now save the file. Press Ctrl + O and Ctrl +X
+•	Sudo systemctl restart filebeat
+•	Sudo systemctl status filebeat
+•	Now click on 3dot
+•	Now scroll down and go to management section
+•	Now click on stack management
+•	Now click on index management in data section
+•	Now go to kibana and click on index patterns
+•	Now type filebeat* (it will display all the related files)
+•	Now select the file and click on next step
+•	Now select @timestamp
+•	Now click on create index pattern
