@@ -1,0 +1,109 @@
+Method 2
+Option 1: Jira Data Center / Server (Self managed)
+This is the most common and recommended setup because you have access to Jira logs.
+
+Step 1: Enable detailed REST API logging in Jira
+Jira uses Log4j for application logs.
+1.1 Enable REST logging from Jira UI (recommended)
+  a.	Go to Jira Admin → System → Logging and Profiling
+  b.	Add a new logger:
+
+Field	              Value
+Package name	      com.atlassian.jira.rest
+Log level           	DEBUG
+
+(Optional but useful)
+•	com.atlassian.plugins.rest
+•	com.atlassian.jira.web.filters.accesslog
+
+✅ This will log:
+•	REST endpoint
+•	HTTP method
+•	Response status
+•	Execution time
+•	Authenticated user (when available)
+
+1.2 (Optional) Enable Access Logs for HTTP details
+For full HTTP request/response visibility (URL, IP, status, latency):
+Edit:
+<JIRA_INSTALL>/conf/server.xml
+
+Ensure AccessLogValve is enabled:
+<Valve className="org.apache.catalina.valves.AccessLogValve"
+       directory="logs"
+       prefix="jira_access_log"
+       suffix=".log"
+       pattern="%h %l %u %t &quot;%r&quot; %s %b %D" />
+
+Restart Jira.
+✅ This captures:
+•	Client IP
+•	HTTP method
+•	REST path
+•	Status code
+•	Response time
+
+Step 2: Identify log files
+Typical log locations:
+Log Type	            Path
+Application logs	    <JIRA_HOME>/log/atlassian-jira.log
+Access logs	          <JIRA_INSTALL>/logs/jira_access_log*.log
+
+Step 3: Ship logs to Elastic (Filebeat)
+Install Filebeat on the Jira node.
+3.1 Filebeat input configuration
+filebeat.yml
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/atlassian/jira/log/atlassian-jira.log
+      - /opt/atlassian/jira/logs/jira_access_log*.log
+    fields:
+      service: jira
+      log_type: rest_api
+    fields_under_root: true
+
+3.2 (Recommended) Parse REST logs with processors
+Example for access logs:
+processors:
+  - dissect:
+      tokenizer: '%{client_ip} %{ident} %{user} [%{timestamp}] "%{method} %{url} %{protocol}" %{status} %{bytes} %{duration}'
+      field: "message"
+      target_prefix: "http"
+
+3.3 Send logs to Elasticsearch
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  index: "jira-rest-logs-%{+yyyy.MM.dd}"
+
+Restart Filebeat:
+systemctl restart filebeat
+
+Step 4: Configure Kibana
+4.1 Create index pattern
+In Kibana → Stack Management → Index Patterns
+jira-rest-logs-*
+
+Time field:
+@timestamp
+
+4.2 Useful Kibana queries (KQL)
+All REST API calls
+service : "jira" AND url : "/rest
+
+Failed REST calls
+status >= 400
+
+Calls by user
+user : "jirauser"
+Slow REST APIs (>2 seconds)
+duration > 2000000
+
+4.3 Suggested dashboards
+Create visualizations for:
+•	REST calls per minute
+•	Top REST endpoints
+•	Error rate (4xx / 5xx)
+•	Slowest APIs
+•	Top calling users or IPs
