@@ -1,0 +1,33 @@
+Now to create Visualization for the index pattern which you have created.
+•	Now click on 3 dot
+•	Now click on visualize
+•	Now we are not selecting any pre-defined visualizations
+•	So we are clicking create visualizations
+•	Select pie chart
+•	And now select the filebeat which your have selected earlier
+•	Now you can change the visualization
+•	In the right side click on options
+•	Uncheck the donut
+•	Show labels and click on update
+•	Now click on save and give the name and click on save
+
+Now to create dashboard for the index pattern which you have created
+•	Now click on 3 dot
+•	Now click on dashboard
+•	Now in the top click on dashboard so it will take you to dashboard create page
+•	Click on create dashboard
+•	Now click on create new in the add an existing or new dashboard
+•	Now cl	ick on add an existing
+•	Now select the visualization which you have created above
+•	Now click on save the dashboard
+•	Give the name and click on save.
+
+Now to download default dashboard in the elastic
+•	Open the terminal
+•	Type sudo filebeat setup -e
+•	Now come to elastic
+•	Click on 3dot and select dashboard
+•	It will show list of dashboard related to filebeat.
+•	Now search system
+•	And select any one of system dashboard
+•	It will display all the details with dashboard.
